@@ -1209,4 +1209,7 @@ bool netCDFDatasetCreateTempFile( NetCDFFormatEnum eFormat,
                                          VSILFILE* fpSrc );
 #endif
 
+int GDAL_nc_open(const char* pszFilename, int nMode, int* pID);
+int GDAL_nc_close(int cdfid);
+
 #endif
