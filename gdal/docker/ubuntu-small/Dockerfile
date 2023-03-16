@@ -26,6 +26,7 @@ RUN apt-get update -y \
 RUN apt-get update -y \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --fix-missing --no-install-recommends \
        python3-dev python3-numpy \
+       libnetcdf-dev \
        libjpeg-dev libgeos-dev \
        libexpat-dev libxerces-c-dev \
        libwebp-dev libpng-dev \
@@ -109,14 +110,14 @@ ARG GDAL_VERSION=master
 ARG GDAL_RELEASE_DATE
 ARG GDAL_BUILD_IS_RELEASE
 RUN if test "${GDAL_VERSION}" = "master"; then \
-        export GDAL_VERSION=$(curl -Ls https://api.github.com/repos/OSGeo/gdal/commits/HEAD -H "Accept: application/vnd.github.VERSION.sha"); \
+        export GDAL_VERSION=$(curl -Ls https://api.github.com/repos/kktuax/gdal/commits/HEAD -H "Accept: application/vnd.github.VERSION.sha"); \
         export GDAL_RELEASE_DATE=$(date "+%Y%m%d"); \
     fi \
     && if test "x${GDAL_BUILD_IS_RELEASE}" = "x"; then \
         export GDAL_SHA1SUM=${GDAL_VERSION}; \
     fi \
     && mkdir gdal \
-    && wget -q https://github.com/OSGeo/gdal/archive/${GDAL_VERSION}.tar.gz -O - \
+    && wget -q https://github.com/kktuax/gdal/archive/${GDAL_VERSION}.tar.gz -O - \
         | tar xz -C gdal --strip-components=1 \
     && cd gdal/gdal \
     && if test "${RSYNC_REMOTE}" != ""; then \
@@ -135,6 +136,7 @@ RUN if test "${GDAL_VERSION}" = "master"; then \
     && LDFLAGS="-L/build${PROJ_INSTALL_PREFIX}/lib -linternalproj" ./configure --prefix=/usr --without-libtool \
     --with-hide-internal-symbols \
     --with-jpeg12 \
+    --with-hdf5 \
     --with-python \
     --with-webp --with-proj=/build${PROJ_INSTALL_PREFIX} \
     --with-libtiff=internal --with-rename-internal-libtiff-symbols \
@@ -181,6 +183,7 @@ RUN apt-get update -y; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-install-recommends \
         python3-numpy libpython3.8 \
         libjpeg-turbo8 libgeos-3.8.0 libgeos-c1v5 \
+        libnetcdf-c++4 netcdf-bin \
         libexpat1 \
         libxerces-c3.2 \
         libwebp6 libpng16-16 \
